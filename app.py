@@ -11,7 +11,7 @@ from pdf_builder import PdfDocument, TOC_MARKER, build_booklet, page_count
 
 
 st.set_page_config(
-    page_title="Automotive Lab Book Builder | Technical Instructor Tools",
+    page_title="Lab Book Builder | Technical Instructor Tools",
     page_icon="📘",
     layout="wide",
 )
@@ -40,10 +40,10 @@ def remove_item(document_id: str) -> None:
 
 
 st.caption("TECHNICAL INSTRUCTOR TOOLS BY AGRIENERGY")
-st.title("Automotive Lab Book Builder")
+st.title("Lab Book Builder")
 st.write(
     "Build customized, professionally organized lab booklets from your PDF lab sheets. "
-    "Designed for automotive and technical education instructors."
+    "Designed for and technical education instructors."
 )
 
 uploads = st.file_uploader(
