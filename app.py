@@ -1,4 +1,4 @@
-"""Streamlit interface for the Automotive Lab Book Builder."""
+"""Streamlit interface for the Lab Book Builder."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import streamlit as st
 from pdf_builder import PdfDocument, TOC_MARKER, build_booklet, page_count
 
 
-st.set_page_config(page_title="Automotive Lab Book Builder", page_icon="📘", layout="wide")
+st.set_page_config(page_title="Lab Book Builder", page_icon="📘", layout="wide")
 
 
 def file_id(name: str, data: bytes) -> str:
@@ -35,7 +35,7 @@ def remove_item(document_id: str) -> None:
     st.session_state.pop("booklet", None)
 
 
-st.title("Automotive Lab Book Builder")
+st.title("Lab Book Builder")
 st.write("Upload PDF lab sheets, arrange them, place the table of contents, and download one finished booklet.")
 
 uploads = st.file_uploader(
@@ -103,7 +103,7 @@ for index, item in enumerate(st.session_state.order):
 st.divider()
 settings_col, action_col = st.columns([1.4, 1])
 with settings_col:
-    book_title = st.text_input("Lab book title", value="Automotive Lab Book")
+    book_title = st.text_input("Lab book title", value="Lab Book")
     toc_title = st.text_input("Table of contents title", value="Table of Contents")
     include_toc = st.checkbox("Include table of contents", value=True)
     add_page_numbers = st.checkbox("Add page numbers", value=True)
