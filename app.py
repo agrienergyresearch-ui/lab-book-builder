@@ -10,7 +10,11 @@ import streamlit as st
 from pdf_builder import PdfDocument, TOC_MARKER, build_booklet, page_count
 
 
-st.set_page_config(page_title="Lab Book Builder", page_icon="📘", layout="wide")
+st.set_page_config(
+    page_title="Automotive Lab Book Builder | Technical Instructor Tools",
+    page_icon="📘",
+    layout="wide",
+)
 
 
 def file_id(name: str, data: bytes) -> str:
@@ -35,8 +39,12 @@ def remove_item(document_id: str) -> None:
     st.session_state.pop("booklet", None)
 
 
-st.title("Lab Book Builder")
-st.write("Upload PDF lab sheets, arrange them, place the table of contents, and download one finished booklet.")
+st.caption("TECHNICAL INSTRUCTOR TOOLS BY AGRIENERGY")
+st.title("Automotive Lab Book Builder")
+st.write(
+    "Build customized, professionally organized lab booklets from your PDF lab sheets. "
+    "Designed for automotive and technical education instructors."
+)
 
 uploads = st.file_uploader(
     "Upload PDF lab sheets",
@@ -136,4 +144,8 @@ with action_col:
             use_container_width=True,
         )
 
-st.caption("Uploaded files are held temporarily for the active session and are not added to a public library.")
+st.divider()
+st.caption(
+    "Technical Instructor Tools by Agrienergy · © 2026 Agrienergy Research  |  "
+    "Uploaded files are temporary and are not added to a public library."
+)
