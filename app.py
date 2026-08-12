@@ -43,7 +43,7 @@ st.caption("TECHNICAL INSTRUCTOR TOOLS BY AGRIENERGY")
 st.title("Lab Book Builder")
 st.write(
     "Build customized, professionally organized lab booklets from your PDF lab sheets. "
-    "Designed for and technical education instructors."
+    "Designed for technical education instructors."
 )
 
 uploads = st.file_uploader(
