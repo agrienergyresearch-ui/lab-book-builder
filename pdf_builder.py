@@ -107,11 +107,21 @@ def make_toc_pdf(entries: Sequence[tuple[str, int, int]], title: str) -> bytes:
     return buffer.getvalue()
 
 
-def _page_number_overlay(width: float, height: float, number: int) -> bytes:
+def _page_number_overlay(width: float, height: float, number: int, alignment: str = "Center") -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=(width, height))
     c.setFont("Helvetica", 10)
-    c.drawCentredString(width / 2, 0.4 * inch, str(number))
+
+    y = 0.4 * inch
+    margin = 0.75 * inch
+    normalized = alignment.lower()
+    if normalized == "left":
+        c.drawString(margin, y, str(number))
+    elif normalized == "right":
+        c.drawRightString(width - margin, y, str(number))
+    else:
+        c.drawCentredString(width / 2, y, str(number))
+
     c.showPage()
     c.save()
     return buffer.getvalue()
@@ -123,6 +133,7 @@ def build_booklet(
     toc_title: str = "Table of Contents",
     include_toc: bool = True,
     add_page_numbers: bool = True,
+    page_number_alignment: str = "Center",
 ) -> bytes:
     """Combine uploaded documents according to ordered_items and return PDF bytes."""
 
@@ -173,7 +184,9 @@ def build_booklet(
         for index, output_page in enumerate(writer.pages, start=1):
             width = float(output_page.mediabox.width)
             height = float(output_page.mediabox.height)
-            overlay = PdfReader(io.BytesIO(_page_number_overlay(width, height, index))).pages[0]
+            overlay = PdfReader(
+                io.BytesIO(_page_number_overlay(width, height, index, page_number_alignment))
+            ).pages[0]
             output_page.merge_page(overlay)
 
     output = io.BytesIO()
