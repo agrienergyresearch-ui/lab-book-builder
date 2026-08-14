@@ -115,6 +115,13 @@ with settings_col:
     toc_title = st.text_input("Table of contents title", value="Table of Contents")
     include_toc = st.checkbox("Include table of contents", value=True)
     add_page_numbers = st.checkbox("Add page numbers", value=True)
+    page_number_alignment = st.radio(
+        "Page number position",
+        options=["Left", "Center", "Right"],
+        index=1,
+        horizontal=True,
+        disabled=not add_page_numbers,
+    )
 
 with action_col:
     st.write("")
@@ -128,6 +135,7 @@ with action_col:
                     toc_title=toc_title.strip() or "Table of Contents",
                     include_toc=include_toc,
                     add_page_numbers=add_page_numbers,
+                    page_number_alignment=page_number_alignment,
                 )
                 st.session_state.output_name = safe_filename(book_title)
         except Exception as exc:
