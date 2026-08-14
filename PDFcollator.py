@@ -82,11 +82,20 @@ def make_toc_pdf(entries: List[Tuple[str, int, int]], title: str = "Table of Con
     return buf.getvalue()
 
 
-def make_pagenum_overlay(page_width: float, page_height: float, page_num: int) -> bytes:
+def make_pagenum_overlay(page_width: float, page_height: float, page_num: int, alignment: str = "center") -> bytes:
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=(page_width, page_height))
     c.setFont("Helvetica", 10)
-    c.drawCentredString(page_width / 2, 0.4 * inch, str(page_num))
+
+    y = 0.4 * inch
+    margin = 0.75 * inch
+    if alignment == "left":
+        c.drawString(margin, y, str(page_num))
+    elif alignment == "right":
+        c.drawRightString(page_width - margin, y, str(page_num))
+    else:
+        c.drawCentredString(page_width / 2, y, str(page_num))
+
     c.showPage()
     c.save()
     return buf.getvalue()
@@ -109,6 +118,7 @@ def combine_with_movable_toc_and_numbers(
     ordered_items: List[Item],
     output_pdf: Path,
     toc_title: str,
+    page_num_alignment: str = "center",
 ) -> None:
     # Split based on TOC marker
     pre_pdfs, post_pdfs = split_items_around_toc(ordered_items)
@@ -161,7 +171,7 @@ def combine_with_movable_toc_and_numbers(
         w = float(page.mediabox.width)
         h = float(page.mediabox.height)
 
-        overlay_bytes = make_pagenum_overlay(w, h, i + 1)
+        overlay_bytes = make_pagenum_overlay(w, h, i + 1, page_num_alignment)
         overlay_reader = PdfReader(io.BytesIO(overlay_bytes))
         page.merge_page(overlay_reader.pages[0])
 
@@ -174,6 +184,9 @@ class PdfOrderApp:
     def __init__(self, root: tk.Tk, folder: Path, pdfs: List[Path]):
         self.root = root
         self.folder = folder
+
+        # Page number alignment checkboxes (center selected by default).
+        self.page_num_alignment = tk.StringVar(value="center")
 
         # Items list includes PDFs + a movable TOC marker (default: at top)
         self.items: List[Item] = [TOC_MARKER] + list(pdfs)
@@ -208,6 +221,20 @@ class PdfOrderApp:
         tk.Button(right, text="Sort PDFs Z→A", width=16, command=self.sort_pdfs_za).pack(pady=3)
         tk.Button(right, text="Insert TOC Here", width=16, command=self.insert_toc_here).pack(pady=12)
 
+        tk.Label(right, text="Page Number Position").pack(pady=(12, 2))
+        tk.Checkbutton(
+            right, text="Left", variable=self.page_num_alignment,
+            onvalue="left", offvalue="", command=lambda: self._set_page_alignment("left")
+        ).pack(anchor="w")
+        tk.Checkbutton(
+            right, text="Center", variable=self.page_num_alignment,
+            onvalue="center", offvalue="", command=lambda: self._set_page_alignment("center")
+        ).pack(anchor="w")
+        tk.Checkbutton(
+            right, text="Right", variable=self.page_num_alignment,
+            onvalue="right", offvalue="", command=lambda: self._set_page_alignment("right")
+        ).pack(anchor="w")
+
         bottom = tk.Frame(root)
         bottom.pack(fill="x", padx=10, pady=(0, 10))
 
@@ -216,6 +243,10 @@ class PdfOrderApp:
         tk.Button(bottom, text="Quit", command=root.destroy).pack(side="right", padx=(0, 8))
 
         self.refresh()
+
+    def _set_page_alignment(self, alignment: str):
+        # Keep exactly one page-number position selected.
+        self.page_num_alignment.set(alignment)
 
     def _display_text(self, item: Item) -> str:
         if item == TOC_MARKER:
@@ -335,7 +366,12 @@ class PdfOrderApp:
         output_pdf = Path(out_path)
 
         try:
-            combine_with_movable_toc_and_numbers(self.items, output_pdf, toc_title="Table of Contents")
+            combine_with_movable_toc_and_numbers(
+                self.items,
+                output_pdf,
+                toc_title="Table of Contents",
+                page_num_alignment=self.page_num_alignment.get() or "center",
+            )
         except Exception as e:
             messagebox.showerror("Error", f"Failed to combine PDFs:\n\n{e}")
             return
